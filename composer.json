@@ -1,0 +1,19 @@
+{
+    "name": "design/laravel-cli",
+    "description": "laravel-cli",
+    "require": {
+        "php": "^7.4",
+        "workerman/workerman": ">=3.5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Design\\LaravelCli\\": "src/"
+        }
+    },
+    "laravel": {
+        "providers": [
+            "Design\\LaravelCli\\LaravelCliServiceProvider"
+        ]
+    }
+}
+
