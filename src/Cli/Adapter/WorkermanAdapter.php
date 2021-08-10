@@ -96,6 +96,8 @@ class WorkermanAdapter implements RequestContracts
 
         foreach ($data as $key => $val) {
             $server['HTTP_' . strtoupper(str_replace('-', '_', $key))] = $val;
+
+            $server[strtoupper(str_replace('-', '_', $key))] = $val;
         }
 
         return $server;
