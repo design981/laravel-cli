@@ -4,6 +4,7 @@ namespace Design\LaravelCli\Cli\Adapter;
 
 use App\Http\Kernel;
 use Design\LaravelCli\Contracts\RequestContracts;
+use Design\LaravelCli\Events\OnResponseEvent;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Workerman\Connection\TcpConnection;
@@ -15,6 +16,11 @@ class WorkermanAdapter implements RequestContracts
 
     protected Request $request;
 
+    /**
+     * build request
+     *
+     * @return \Illuminate\Http\Response|Response
+     */
     public function request()
     {
         $request = $this->generageRequest();
@@ -33,25 +39,42 @@ class WorkermanAdapter implements RequestContracts
         return $laravelResponse;
     }
 
+    /**
+     * send
+     *
+     * @param Response $response
+     */
     public function response(Response $response)
     {
         $this->conn->send(new \Workerman\Protocols\Http\Response(200, $response->headers->all(), $response->getContent()));
+
+        OnResponseEvent::handle();
     }
 
     /**
+     * generate symfony request
+     *
      * @return \Illuminate\Http\Request
      */
     private function generageRequest(): \Illuminate\Http\Request
     {
-        $request = \Illuminate\Http\Request::create($this->request->uri(), $this->request->method(), [], $this->request->cookie(), $this->request->file(), array_merge([
-            'USER' => $this->conn->worker->user,
-            'HOME' => $_SERVER['HOME'],
-            'SERVER_NAME' => $this->request->host(),
-            'SERVER_PORT' => $this->conn->getLocalPort(),
-            'SERVER_ADDR' => $this->conn->getLocalAddress(),
-            'REMOTE_PORT' => $this->conn->getRemotePort(),
-            'REMOTE_ADDR' => $this->conn->getRemoteIp(),
-        ], $this->getServerHeader($this->request->header())));
+
+        $request = \Illuminate\Http\Request::create(
+            $this->request->uri(),
+            $this->request->method(),
+            $this->request->post(),
+            $this->request->cookie(),
+            $this->request->file(),
+            array_merge([
+                'USER' => $this->conn->worker->user,
+                'HOME' => $_SERVER['HOME'],
+                'SERVER_NAME' => $this->request->host(),
+                'SERVER_PORT' => $this->conn->getLocalPort(),
+                'SERVER_ADDR' => $this->conn->getLocalAddress(),
+                'REMOTE_PORT' => $this->conn->getRemotePort(),
+                'REMOTE_ADDR' => $this->conn->getRemoteIp(),
+            ], $this->getServerHeader($this->request->header()))
+        );
 
         if (0 === strpos($request->headers->get('CONTENT_TYPE', ''), 'application/x-www-form-urlencoded')
             && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), ['PUT', 'DELETE', 'PATCH'])

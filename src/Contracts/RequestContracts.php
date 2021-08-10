@@ -1,4 +1,5 @@
 <?php
+
 namespace Design\LaravelCli\Contracts;
 
 use Symfony\Component\HttpFoundation\Response;

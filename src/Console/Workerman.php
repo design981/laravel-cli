@@ -15,8 +15,6 @@ class Workerman extends Command
 
     private $config;
 
-    private $handles = ['onWorkerStart', 'onConnect', 'onMessage', 'onClose', 'onError', 'onBufferFull', 'onBufferDrain', 'onWorkerReload', 'onWebSocketConnect'];
-
     /**
      * The name and signature of the console command.
      *
@@ -75,7 +73,9 @@ class Workerman extends Command
         $this->server->count = $this->config['count'] ?? 2;
         $this->server->name = $this->config['name'] ?? 'workerman http';
 
-        $this->server->onMessage = [new \Design\LaravelCli\Cli\Workerman(), 'onMessage'];
+        $class = new \Design\LaravelCli\Cli\Workerman();
+        $this->server->onMessage = [$class, 'onMessage'];
+
         try {
             Worker::runAll();
         } catch (\Exception $e) {

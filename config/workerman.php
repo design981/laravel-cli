@@ -1,7 +1,7 @@
 <?php
 return [
     'protocol'=>  "http",
-    'count'=> 8,
+    'count'=> 1,
     'ip' => '0.0.0.0',
     'port' => '8880',
     'path' => storage_path('workerman') . '/',
