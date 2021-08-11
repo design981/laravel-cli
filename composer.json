@@ -2,8 +2,7 @@
     "name": "design/laravel-cli",
     "description": "laravel-cli",
     "require": {
-        "php": "^7.4",
-        "workerman/workerman": ">=3.5.0"
+        "php": "^7.4"
     },
     "autoload": {
         "psr-4": {

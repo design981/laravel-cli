@@ -70,9 +70,10 @@ class WorkermanAdapter implements RequestContracts
                 'HOME' => $_SERVER['HOME'],
                 'SERVER_NAME' => $this->request->host(),
                 'SERVER_PORT' => $this->conn->getLocalPort(),
-                'SERVER_ADDR' => $this->conn->getLocalAddress(),
+                'SERVER_ADDR' => $_SERVER['SERVER_IP'],
                 'REMOTE_PORT' => $this->conn->getRemotePort(),
                 'REMOTE_ADDR' => $this->conn->getRemoteIp(),
+                'SERVER_PROTOCOL'=> $this->request->protocolVersion()
             ], $this->getServerHeader($this->request->header()))
         );
 

@@ -3,7 +3,7 @@ namespace Design\LaravelCli\Cli;
 
 use Design\LaravelCli\Cli\Adapter\WorkermanAdapter;
 
-class Workerman extends WorkermanAdapter
+class WorkermanCli extends WorkermanAdapter
 {
 
     public function onMessage($conn, $request)
