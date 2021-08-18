@@ -3,6 +3,7 @@
 namespace Design\LaravelCli\Console;
 
 use Design\LaravelCli\Cli\WorkermanCli;
+use Exception;
 use Illuminate\Support\Env;
 use Workerman\Worker;
 
@@ -42,9 +43,9 @@ class Workerman extends Command
         $config = config('cli.workerman');
 
         Worker::$pidFile = $config['path'] . str_replace(['%SERVER%', '%IP%'], ['workerman_http', Env::get('SERVER_IP')], $config['pid']);
+        Worker::$logFile = $config['path'] . 'workerman.log';
 
-        switch ($this->argument('status'))
-        {
+        switch ($this->argument('status')) {
             case 'start':
                 $this->message("Generate Pid file path in " . Worker::$pidFile);
                 break;
@@ -53,17 +54,18 @@ class Workerman extends Command
             default:
         }
 
-        if($this->option('d')) Worker::$daemonize = true;
+        if ($this->option('d')) Worker::$daemonize = true;
 
         $this->server = new Worker("{$config['protocol']}://{$config['ip']}:{$config['port']}");
-        $this->server->count = $this->config['count'] ?? 2;
-        $this->server->name = $this->config['name'] ?? 'workerman_http';
+        $this->server->count = $config['count'] ?? 2;
+        $this->server->name = $config['name'] ?? 'workerman_http';
 
         $this->server->onMessage = [$class, 'onMessage'];
+        $this->server->onWorkerStart = [$class, 'onWorkerStart'];
 
         try {
             Worker::runAll();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error($e->getMessage());
         }
     }

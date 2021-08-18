@@ -4,7 +4,7 @@ namespace Design\LaravelCli\Cli\Adapter;
 
 use App\Http\Kernel;
 use Design\LaravelCli\Contracts\RequestContracts;
-use Design\LaravelCli\Events\OnResponseEvent;
+use Illuminate\Support\Facades\Event;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Workerman\Connection\TcpConnection;
@@ -16,10 +16,16 @@ class WorkermanAdapter implements RequestContracts
 
     protected Request $request;
 
+    public function __construct(TcpConnection $conn, Request $request)
+    {
+        $this->conn = $conn;
+        $this->request = $request;
+
+        $this->request();
+    }
+
     /**
      * build request
-     *
-     * @return \Illuminate\Http\Response|Response
      */
     public function request()
     {
@@ -36,7 +42,7 @@ class WorkermanAdapter implements RequestContracts
 
         $kernel->terminate($request, $laravelResponse);
 
-        return $laravelResponse;
+        $this->response($laravelResponse);
     }
 
     /**
@@ -48,7 +54,7 @@ class WorkermanAdapter implements RequestContracts
     {
         $this->conn->send(new \Workerman\Protocols\Http\Response(200, $response->headers->all(), $response->getContent()));
 
-        OnResponseEvent::handle();
+        Event::dispatch('workerman.response', [$this->conn, $this->request]);
     }
 
     /**
@@ -73,7 +79,7 @@ class WorkermanAdapter implements RequestContracts
                 'SERVER_ADDR' => $_SERVER['SERVER_IP'],
                 'REMOTE_PORT' => $this->conn->getRemotePort(),
                 'REMOTE_ADDR' => $this->conn->getRemoteIp(),
-                'SERVER_PROTOCOL'=> $this->request->protocolVersion()
+                'SERVER_PROTOCOL' => $this->request->protocolVersion()
             ], $this->getServerHeader($this->request->header()))
         );
 

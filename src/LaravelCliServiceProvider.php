@@ -3,6 +3,9 @@
 namespace Design\LaravelCli;
 
 use Design\LaravelCli\Console\Workerman;
+use Design\LaravelCli\Listeners\EloquentTransactionListener;
+use Design\LaravelCli\Listeners\KeepAliveListeners;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class LaravelCliServiceProvider extends ServiceProvider
@@ -17,6 +20,7 @@ class LaravelCliServiceProvider extends ServiceProvider
 
         $this->mergeConfig();
         $this->registerConsoleCommands();
+        $this->registerSubscribe();
     }
 
     /**
@@ -56,5 +60,16 @@ class LaravelCliServiceProvider extends ServiceProvider
         $this->commands([
             Workerman::class
         ]);
+    }
+
+    /**
+     * 订阅
+     */
+    protected function registerSubscribe()
+    {
+        // 事务回滚
+        Event::listen('workerman.response', EloquentTransactionListener::class);
+        // keep-alive
+        Event::listen('workerman.response', KeepAliveListeners::class);
     }
 }
