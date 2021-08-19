@@ -2,13 +2,13 @@
 
 namespace Design\LaravelCli\Cli\Workerman;
 
-use Design\LaravelCli\Contracts\WorkermanRequestFactoryContracts;
+use Design\LaravelCli\Contracts\WorkermanRequestFactoryInterface;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Workerman\Connection\TcpConnection as WorkermanTcpConnection;
 use Workerman\Protocols\Http\Request as WorkermanRequest;
 
-class RequestFactory implements WorkermanRequestFactoryContracts
+class RequestFactory implements WorkermanRequestFactoryInterface
 {
 
     /**
@@ -29,7 +29,7 @@ class RequestFactory implements WorkermanRequestFactoryContracts
                 'HOME' => $_SERVER['HOME'],
                 'SERVER_NAME' => $workermanRequest->host(),
                 'SERVER_PORT' => $conn->getLocalPort(),
-                'SERVER_ADDR' => $_SERVER['SERVER_IP'],
+                'SERVER_ADDR' => $_SERVER['SERVER_IP'] ?? '127.0.0.1',
                 'REMOTE_PORT' => $conn->getRemotePort(),
                 'REMOTE_ADDR' => $conn->getRemoteIp(),
                 'SERVER_PROTOCOL' => $workermanRequest->protocolVersion()

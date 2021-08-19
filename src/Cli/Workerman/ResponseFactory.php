@@ -2,12 +2,12 @@
 
 namespace Design\LaravelCli\Cli\Workerman;
 
-use Design\LaravelCli\Contracts\WorkermanResponseFactoryContracts;
+use Design\LaravelCli\Contracts\WorkermanResponseFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Workerman\Connection\TcpConnection as WorkermanTcpConnection;
 use Workerman\Protocols\Http\Response as WorkermanResponse;
 
-class ResponseFactory implements WorkermanResponseFactoryContracts
+class ResponseFactory implements WorkermanResponseFactoryInterface
 {
 
     /**

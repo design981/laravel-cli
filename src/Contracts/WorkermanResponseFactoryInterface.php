@@ -5,7 +5,7 @@ namespace Design\LaravelCli\Contracts;
 use Symfony\Component\HttpFoundation\Response;
 use Workerman\Connection\TcpConnection as WorkermanTcpConnection;
 
-interface WorkermanResponseFactoryContracts
+interface WorkermanResponseFactoryInterface
 {
     /**
      * @param Response $response
