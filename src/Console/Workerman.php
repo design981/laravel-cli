@@ -2,8 +2,12 @@
 
 namespace Design\LaravelCli\Console;
 
-use Design\LaravelCli\Cli\WorkermanCli;
+use Design\LaravelCli\Cli\Workerman\Message;
+use Design\LaravelCli\Cli\Workerman\RequestFactory;
+use Design\LaravelCli\Cli\Workerman\ResponseFactory;
+use Design\LaravelCli\Cli\Workerman\Start;
 use Exception;
+use App\Http\Kernel;
 use Illuminate\Support\Env;
 use Workerman\Worker;
 
@@ -28,11 +32,9 @@ class Workerman extends Command
     protected $description = 'run laravel for workerman';
 
     /**
-     * Execute the console command.
-     *
-     * @param WorkermanCli $class
+     * @param Kernel $kernel
      */
-    public function handle(WorkermanCli $class)
+    public function handle(Kernel $kernel)
     {
 
         if (!class_exists(Worker::class)) {
@@ -60,8 +62,13 @@ class Workerman extends Command
         $this->server->count = $config['count'] ?? 2;
         $this->server->name = $config['name'] ?? 'workerman_http';
 
-        $this->server->onMessage = [$class, 'onMessage'];
-        $this->server->onWorkerStart = [$class, 'onWorkerStart'];
+
+        $this->server->onMessage = new Message(
+            new RequestFactory(),
+            new ResponseFactory(),
+            $kernel
+        );
+        $this->server->onWorkerStart = new Start;
 
         try {
             Worker::runAll();
